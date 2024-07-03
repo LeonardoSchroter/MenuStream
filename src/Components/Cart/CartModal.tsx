@@ -1,5 +1,3 @@
-// Components/CartModal.tsx
-import React from 'react';
 import { ProductData } from '../../Interface/ProductData';
 
 interface CartModalProps {
@@ -9,29 +7,47 @@ interface CartModalProps {
 }
 
 export function CartModal({ cartItems, removeFromCart, closeModal }: CartModalProps) {
+    // calcul valor total
+    const calculateTotal = () => {
+        return cartItems.reduce((total, item) => total + item.price, 0);
+    };
+
+   
+    const handleRemoveFromCart = (id: number) => {
+        removeFromCart(id); 
+    };
+
     return (
-        <div className="modal fade show" style={{ display: 'block' }} tabIndex={-1} role="dialog">
-            <div className="modal-dialog" role="document">
+        <div className="modal fade show" style={{ display: 'block' }} tabIndex={-1}>
+            <div className="modal-dialog modal-lg">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title">Your Cart</h5>
+                        <h5 className="modal-title">Cart</h5>
                         <button type="button" className="btn-close" onClick={closeModal}></button>
                     </div>
                     <div className="modal-body">
-                        {cartItems.length === 0 ? (
-                            <p>Your cart is empty.</p>
+                        {cartItems.length > 0 ? (
+                            <>
+                                <ul className="list-group mb-3">
+                                    {cartItems.map(item => (
+                                        <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
+                                            <div className="d-flex align-items-center">
+                                                <img src={item.image} className="img-thumbnail mr-3" alt={item.name} style={{ maxWidth: '100px' }} />
+                                                <div>
+                                                    <h6>{item.name}</h6>
+                                                    <p>${item.price}</p>
+                                                </div>
+                                            </div>
+                                            <button className="btn btn-danger btn-sm" onClick={() => handleRemoveFromCart(item.id)}>Remove</button>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <div className="text-end">
+                                    <p><strong>Total:</strong> ${calculateTotal().toFixed(2)}</p>
+                                </div>
+                            </>
                         ) : (
-                            <ul className="list-group">
-                                {cartItems.map(item => (
-                                    <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
-                                        <div className="d-flex align-items-center">
-                                            <img src={item.image} alt={item.name} className="img-thumbnail" style={{ width: '50px', height: '50px', marginRight: '10px' }} />
-                                            <span>{item.name}</span>
-                                        </div>
-                                        <button className="btn btn-danger" onClick={() => removeFromCart(item.id!)}>Remove</button>
-                                    </li>
-                                ))}
-                            </ul>
+                            <p>Your cart is empty.</p>
                         )}
                     </div>
                     <div className="modal-footer">
