@@ -1,12 +1,11 @@
-import { CustomerData } from './CustomerData';
-import { OrderDetailData } from './OrderDetailData';
+import { OrderDetailData } from './OrderDetailData'; 
 
-export interface OrderData {
-    id: number;
-    customer: CustomerData;
+export interface Order {
+    customerId: number;
     orderDetails: OrderDetailData[];
     totalAmount: number;
     status: string;
     orderDate: Date;
-    fulfillmentDate?: Date;
+    fulfillmentDate: Date ;
+
 }

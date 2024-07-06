@@ -1,4 +1,3 @@
-// Components/navbar.tsx
 import { Link } from 'react-router-dom';
 
 interface NavbarProps {
@@ -17,6 +16,9 @@ export function Navbar({ openCart }: NavbarProps) {
                     <ul className="navbar-nav">
                         <li className="nav-item">
                             <Link className="nav-link" to="/products">Products</Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/customers">Customers</Link>
                         </li>
                         <li className="nav-item">
                             <span className="nav-link" role="button" onClick={openCart}>Cart</span>

@@ -1,4 +1,9 @@
+import React, { useState } from 'react';
 import { ProductData } from '../../Interface/ProductData';
+import { useOrderMutate } from '../../hooks/UseOrderDataMutate';
+import { OrderDetailData } from '../../Interface/OrderDetailData';
+import { Order } from '../../Interface/OrderData';
+import { CustomerData } from '../../Interface/CustomerData';
 
 interface CartModalProps {
     cartItems: ProductData[];
@@ -7,14 +12,56 @@ interface CartModalProps {
 }
 
 export function CartModal({ cartItems, removeFromCart, closeModal }: CartModalProps) {
-    // calcul valor total
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const { mutate } = useOrderMutate();
+
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => total + item.price, 0);
     };
 
-   
     const handleRemoveFromCart = (id: number) => {
-        removeFromCart(id); 
+        removeFromCart(id);
+    };
+
+    const handleConfirmPurchase = () => {
+        const groupedItems = cartItems.reduce((grouped, item) => { //juntar produtos por id para criar aopenas 1 order details caso seja igual
+            const existingItem = grouped.find(i => i.productId === item.id);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                grouped.push({ productId: item.id, quantity: 1 });
+            }
+            return grouped;
+        }, [] as { productId: number; quantity: number }[]);
+
+        const orderDetails: OrderDetailData[] = groupedItems.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity
+        }));
+
+        const orderData: Order = {
+            customerId: 1,
+            orderDetails: orderDetails,
+            totalAmount: calculateTotal(),
+            status: 'PENDING',
+            orderDate: new Date(),
+            fulfillmentDate: new Date()
+        };
+
+        mutate(orderData, {
+            onSuccess: () => {
+                setSuccessMessage("Pedido criado com sucesso!");
+                setErrorMessage(null);
+                setTimeout(() => {
+                    setSuccessMessage(null);
+                    closeModal();
+                }, 3000);
+            },
+            onError: (error) => {
+                setErrorMessage(`Erro ao criar o pedido: ${error.message}`);
+            }
+        });
     };
 
     return (
@@ -26,6 +73,16 @@ export function CartModal({ cartItems, removeFromCart, closeModal }: CartModalPr
                         <button type="button" className="btn-close" onClick={closeModal}></button>
                     </div>
                     <div className="modal-body">
+                        {successMessage && (
+                            <div className="alert alert-success" role="alert">
+                                {successMessage}
+                            </div>
+                        )}
+                        {errorMessage && (
+                            <div className="alert alert-danger" role="alert">
+                                {errorMessage}
+                            </div>
+                        )}
                         {cartItems.length > 0 ? (
                             <>
                                 <ul className="list-group mb-3">
@@ -51,6 +108,9 @@ export function CartModal({ cartItems, removeFromCart, closeModal }: CartModalPr
                         )}
                     </div>
                     <div className="modal-footer">
+                        <button type="button" className="btn btn-primary" onClick={handleConfirmPurchase}>
+                            Confirm Purchase
+                        </button>
                         <button type="button" className="btn btn-secondary" onClick={closeModal}>Close</button>
                     </div>
                 </div>

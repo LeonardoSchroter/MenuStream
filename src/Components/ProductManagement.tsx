@@ -1,4 +1,3 @@
-// Components/ProductManagement.tsx
 import { useState } from 'react';
 import { ProductData } from '../Interface/ProductData';
 import { useProductData } from '../hooks/useProductData';
