@@ -3,7 +3,6 @@ import { ProductData } from '../../Interface/ProductData';
 import { useOrderMutate } from '../../hooks/UseOrderDataMutate';
 import { OrderDetailData } from '../../Interface/OrderDetailData';
 import { Order } from '../../Interface/OrderData';
-import { CustomerData } from '../../Interface/CustomerData';
 
 interface CartModalProps {
     cartItems: ProductData[];
@@ -21,11 +20,14 @@ export function CartModal({ cartItems, removeFromCart, closeModal }: CartModalPr
     };
 
     const handleRemoveFromCart = (id: number) => {
+        if(id == -1){
+            cartItems.map(item =>(handleRemoveFromCart(item.id)));
+        }
         removeFromCart(id);
     };
 
     const handleConfirmPurchase = () => {
-        const groupedItems = cartItems.reduce((grouped, item) => { //juntar produtos por id para criar aopenas 1 order details caso seja igual
+        const groupedItems = cartItems.reduce((grouped, item) => {
             const existingItem = grouped.find(i => i.productId === item.id);
             if (existingItem) {
                 existingItem.quantity++;
@@ -55,8 +57,9 @@ export function CartModal({ cartItems, removeFromCart, closeModal }: CartModalPr
                 setErrorMessage(null);
                 setTimeout(() => {
                     setSuccessMessage(null);
-                    closeModal();
-                }, 3000);
+                    removeFromCart(-1); 
+                    closeModal(); // Fecha o modal
+                }, 1000);
             },
             onError: (error) => {
                 setErrorMessage(`Erro ao criar o pedido: ${error.message}`);

@@ -34,7 +34,7 @@ function App() {
 
     return (
         <Router>
-            <Navbar openCart={handleOpenCartModal} />
+            <Navbar openCart={handleOpenCartModal} /> {/* Passando a função para abrir o carrinho */}
             <Routes>
                 <Route path="/" element={
                     <div className='container'>
